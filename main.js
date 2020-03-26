@@ -6,7 +6,7 @@ var app = new Vue({
     image: './assets/vmSocks-green-onWhite.jpg',
     link: 'http://www.shannonwhalen.com',
     inStock: true,
-    inventory: 10,
+    inventory: 15,
     onSale: false,
     details: ['80% Cotton', '20% Polyester', 'Gender-neutral'],
     variants: [
@@ -27,9 +27,15 @@ var app = new Vue({
   methods: {
     addToCart: function() {
       this.cart += 1;
+      this.inventory -= 1;
+      if (this.inventory == 0) this.inStock = false;
     },
     removeFromCart: function() {
-      if (this.cart > 0) this.cart -= 1;
+      if (this.cart > 0) {
+        this.cart -= 1;
+        this.inventory += 1;
+        this.inStock = true;
+      }
     },
     updateProduct: function(variantImage) {
       this.image = variantImage;
