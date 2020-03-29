@@ -3,6 +3,10 @@ Vue.component('product', {
     premium: {
       type: Boolean,
       required: true
+    },
+    cart: {
+      type: Array,
+      required: true
     }
   },
   template: `<div class="product">
@@ -42,12 +46,12 @@ Vue.component('product', {
     </button>
     <button
       v-on:click="removeFromCart"
-      :disabled="cart == 0"
-      :class="{ disabledButton: cart == 0 }"
+      :disabled="cart.length == 0"
+      :class="{ disabledButton: cart.length == 0 }"
     >
       Remove item
     </button>
-    <div class="cart"><p>Cart {{ cart }}</p></div>
+    
   </div>
 </div>`,
   data() {
@@ -71,25 +75,26 @@ Vue.component('product', {
           variantId: 2235,
           variantColor: 'blue',
           variantImage: './assets/vmSocks-blue-onWhite.jpg',
-          variantQuantity: 0
+          variantQuantity: 20
         }
       ],
-      sizes: ['small', 'medium', 'large'],
-      cart: 0
+      sizes: ['small', 'medium', 'large']
     };
   },
   methods: {
     addToCart: function() {
-      this.cart += 1;
+      this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
       this.inventory -= 1;
       if (this.inventory == 0) this.inStock = false;
     },
     removeFromCart: function() {
-      if (this.cart > 0) {
-        this.cart -= 1;
-        this.inventory += 1;
-        this.inStock = true;
-      }
+      this.$emit(
+        'remove-from-cart',
+        this.variants[this.selectedVariant].variantId
+      );
+
+      this.inventory += 1;
+      this.inStock = true;
     },
     updateProduct: function(index) {
       this.selectedVariant = index;
@@ -131,6 +136,17 @@ Vue.component('product-details', {
 var app = new Vue({
   el: '#app',
   data: {
-    premium: true
+    premium: true,
+    cart: []
+  },
+  methods: {
+    updateCart(id) {
+      this.cart.push(id);
+    },
+    removeFromCart(id) {
+      if (this.cart.includes(id)) {
+        this.cart.splice(this.cart.indexOf(id), 1);
+      }
+    }
   }
 });
